@@ -1,0 +1,143 @@
+/*
+  styles.css
+  Description: Custom styles to reflect a minimal, Apple-like design
+               with Simporter’s violet branding and Reveal.js overrides.
+*/
+
+/* ---------------------------------
+   Root Theme Variables
+--------------------------------- */
+:root {
+  --brand-primary: #7c3aed; /* Tailwind-like violet-600 */
+  --brand-accent:  #8b5cf6; /* Tailwind-like violet-500 */
+  --brand-bg:      #f9fafb; /* Tailwind-like gray-50 */
+  --text-base:     #111827; /* Tailwind-like gray-900 */
+  --text-subtle:   #6b7280; /* Tailwind-like gray-500 */
+  --text-muted:    #4b5563; /* Tailwind-like gray-600 */
+  --danger:        #dc2626; /* Tailwind-like red-600 */
+  --success:       #16a34a; /* Tailwind-like green-600 */
+}
+
+/* ---------------------------------
+   Global Base
+--------------------------------- */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--brand-bg);
+  color: var(--text-base);
+  line-height: 1.5;
+}
+
+a,
+button {
+  transition: background-color 0.2s, color 0.2s;
+}
+
+a:hover,
+button:hover {
+  cursor: pointer;
+}
+
+/* ---------------------------------
+   Reveal.js Overrides
+--------------------------------- */
+/* The .reveal wrapper */
+.reveal {
+  color: var(--text-base);
+  font-size: 16px; /* Adjust if you want bigger slides */
+  font-family: inherit; /* Use the same font as the page */
+}
+
+/* Individual Slides */
+.reveal .slides section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Slide Titles (e.g., <h2>) */
+.reveal .slides section h2 {
+  color: var(--brand-primary);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Slide Paragraphs */
+.reveal .slides section p {
+  font-size: 1.125rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 800px;
+}
+
+/* Editable Areas */
+[contenteditable] {
+  outline: 2px dashed transparent;
+  transition: outline-color 0.2s;
+}
+[contenteditable]:hover {
+  outline-color: var(--brand-accent);
+}
+[contenteditable]:focus {
+  outline-color: var(--brand-primary);
+}
+
+/* Progress Bar */
+.reveal .progress,
+.reveal .progress span {
+  background: var(--brand-primary) !important;
+}
+
+/* Slide Navigation Controls (arrows) */
+.reveal .navigate-left,
+.reveal .navigate-right,
+.reveal .navigate-up,
+.reveal .navigate-down {
+  background-color: #fff;
+  border: 1px solid #e5e7eb; /* gray-200-like border */
+  color: var(--text-base);
+}
+.reveal .navigate-left:hover,
+.reveal .navigate-right:hover,
+.reveal .navigate-up:hover,
+.reveal .navigate-down:hover {
+  background-color: var(--brand-accent);
+  color: #fff;
+}
+
+/* ---------------------------------
+   Utility Classes (Optional)
+--------------------------------- */
+/* Example: brand-colored text or backgrounds */
+.text-brand {
+  color: var(--brand-primary) !important;
+}
+.bg-brand {
+  background-color: var(--brand-primary) !important;
+  color: #fff !important;
+}
+
+/* Example: subtle border or shadow for containers */
+.card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Example: transitions for interactive elements */
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}
+.transition-colors {
+  transition: color 0.2s, background-color 0.2s;
+}
+  
