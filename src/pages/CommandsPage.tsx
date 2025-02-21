@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
-import { useStore } from '@/lib/store';
-import { Plus, Save, Trash2, Edit2, FileText, Users, ShoppingBag, MessageSquare, BarChart2, DollarSign } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { useStore } from "@/lib/store";
+import {
+  Plus,
+  Save,
+  Trash2,
+  Edit2,
+  FileText,
+  Users,
+  ShoppingBag,
+  MessageSquare,
+  BarChart2,
+  DollarSign,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface CommandTemplate {
   id: string;
@@ -18,24 +29,16 @@ interface CommandTemplate {
 
 const defaultTemplates: CommandTemplate[] = [
   {
-    id: 'concept-portfolio',
-    name: 'Concept Portfolio',
-    command: '/portfolio',
-    description: 'Create and manage product concept portfolios',
-    color: 'emerald',
-    icon: 'ShoppingBag',
+    id: "concept-portfolio",
+    name: "Concept Portfolio",
+    command: "/portfolio",
+    description: "Create and manage product concept portfolios",
+    color: "emerald",
+    icon: "ShoppingBag",
     template: `# {topic} Concept Portfolio
 
 ## Overview
 {overview}
-
-## Concepts
-{concepts.map(concept => `
-### ${concept.name}
-- Value Proposition: ${concept.value}
-- Target Audience: ${concept.audience}
-- Key Features: ${concept.features.join(', ')}
-`).join('\n')}
 
 ## Market Opportunity
 {marketOpportunity}
@@ -47,15 +50,15 @@ const defaultTemplates: CommandTemplate[] = [
 2. 3-5 distinct concepts
 3. Market opportunity assessment
 4. Recommended next steps`,
-    isActive: true
+    isActive: true,
   },
   {
-    id: 'social-analysis',
-    name: 'Social & Review Analysis',
-    command: '/social',
-    description: 'Analyze consumer feedback and unmet needs',
-    color: 'blue',
-    icon: 'MessageSquare',
+    id: "social-analysis",
+    name: "Social & Review Analysis",
+    command: "/social",
+    description: "Analyze consumer feedback and unmet needs",
+    color: "blue",
+    icon: "MessageSquare",
     template: `# Consumer Insights: {topic}
 
 ## Key Findings
@@ -77,15 +80,17 @@ const defaultTemplates: CommandTemplate[] = [
 2. Unmet needs and pain points
 3. Sentiment analysis
 4. Strategic recommendations`,
-    isActive: true
+    isActive: true,
   },
   // Add more default templates...
 ];
 
 export function CommandsPage() {
   const { isOwner } = useStore();
-  const [templates, setTemplates] = useState<CommandTemplate[]>(defaultTemplates);
-  const [editingTemplate, setEditingTemplate] = useState<CommandTemplate | null>(null);
+  const [templates, setTemplates] =
+    useState<CommandTemplate[]>(defaultTemplates);
+  const [editingTemplate, setEditingTemplate] =
+    useState<CommandTemplate | null>(null);
   const [showEditor, setShowEditor] = useState(false);
 
   if (!isOwner) {
@@ -106,23 +111,26 @@ export function CommandsPage() {
 
   const handleSaveTemplate = (template: CommandTemplate) => {
     if (editingTemplate) {
-      setTemplates(prev => 
-        prev.map(t => t.id === template.id ? template : t)
+      setTemplates((prev) =>
+        prev.map((t) => (t.id === template.id ? template : t))
       );
     } else {
-      setTemplates(prev => [...prev, { ...template, id: Date.now().toString() }]);
+      setTemplates((prev) => [
+        ...prev,
+        { ...template, id: Date.now().toString() },
+      ]);
     }
     setShowEditor(false);
     setEditingTemplate(null);
   };
 
   const handleDeleteTemplate = (id: string) => {
-    setTemplates(prev => prev.filter(t => t.id !== id));
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
   };
 
   const handleToggleActive = (id: string) => {
-    setTemplates(prev =>
-      prev.map(t => t.id === id ? { ...t, isActive: !t.isActive } : t)
+    setTemplates((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, isActive: !t.isActive } : t))
     );
   };
 
@@ -150,7 +158,7 @@ export function CommandsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {templates.map(template => (
+        {templates.map((template) => (
           <div
             key={template.id}
             className={cn(
@@ -189,7 +197,7 @@ export function CommandsPage() {
                       : "text-gray-400 dark:text-gray-500"
                   )}
                 >
-                  {template.isActive ? 'Active' : 'Inactive'}
+                  {template.isActive ? "Active" : "Inactive"}
                 </button>
                 <button
                   onClick={() => handleDeleteTemplate(template.id)}
@@ -257,14 +265,14 @@ interface TemplateEditorProps {
 function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
   const [formData, setFormData] = useState<CommandTemplate>(
     template || {
-      id: '',
-      name: '',
-      command: '',
-      description: '',
-      color: 'blue',
-      icon: 'FileText',
-      template: '',
-      promptTemplate: '',
+      id: "",
+      name: "",
+      command: "",
+      description: "",
+      color: "blue",
+      icon: "FileText",
+      template: "",
+      promptTemplate: "",
       isActive: true,
     }
   );
@@ -278,7 +286,7 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
     <form onSubmit={handleSubmit} className="h-full flex flex-col">
       <div className="flex-1 p-6 overflow-auto">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-          {template ? 'Edit Template' : 'New Template'}
+          {template ? "Edit Template" : "New Template"}
         </h2>
 
         <div className="space-y-6">
@@ -290,7 +298,9 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
               <input
                 type="text"
                 value={formData.name}
-                onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
                 required
               />
@@ -302,7 +312,9 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
               <input
                 type="text"
                 value={formData.command}
-                onChange={e => setFormData(prev => ({ ...prev, command: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, command: e.target.value }))
+                }
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
                 required
               />
@@ -316,7 +328,12 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
             <input
               type="text"
               value={formData.description}
-              onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
               required
             />
@@ -329,7 +346,9 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
               </label>
               <select
                 value={formData.color}
-                onChange={e => setFormData(prev => ({ ...prev, color: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, color: e.target.value }))
+                }
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
               >
                 <option value="blue">Blue</option>
@@ -346,7 +365,9 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
               </label>
               <select
                 value={formData.icon}
-                onChange={e => setFormData(prev => ({ ...prev, icon: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, icon: e.target.value }))
+                }
                 className="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
               >
                 <option value="FileText">Document</option>
@@ -365,7 +386,9 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
             </label>
             <textarea
               value={formData.template}
-              onChange={e => setFormData(prev => ({ ...prev, template: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, template: e.target.value }))
+              }
               className="w-full h-64 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 font-mono text-sm"
               placeholder="Use {placeholders} for dynamic content"
               required
@@ -378,7 +401,12 @@ function TemplateEditor({ template, onSave, onClose }: TemplateEditorProps) {
             </label>
             <textarea
               value={formData.promptTemplate}
-              onChange={e => setFormData(prev => ({ ...prev, promptTemplate: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  promptTemplate: e.target.value,
+                }))
+              }
               className="w-full h-32 px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 font-mono text-sm"
               placeholder="Template for generating the AI prompt"
               required
