@@ -1,43 +1,83 @@
-import React, { useState } from 'react';
-import { Code2 } from 'lucide-react';
-import IDE from './components/IDE';
-import Chat from './components/Chat';
-import SearchBar from './components/SearchBar';
+import React from 'react';
+import { useStore } from './lib/store';
+import { Layout } from './components/layout/Layout';
+import { HomePage } from './pages/HomePage';
+import { WelcomePage } from './pages/WelcomePage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { MyProjectsPage } from './pages/MyProjectsPage';
+import { TemplatesPage } from './pages/TemplatesPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { TeamPage } from './pages/TeamPage';
+import { TokenUsagePage } from './pages/TokenUsagePage';
+import { ContentLibrary } from './pages/ContentLibrary';
+import { ConceptTestPage } from './pages/ConceptTestPage';
+import { ApiPage } from './pages/ApiPage';
+import { KnowledgeBasePage } from './pages/KnowledgeBasePage';
+import { CustomFeaturePage } from './pages/CustomFeaturePage';
+import { Walkthrough } from './components/Walkthrough';
+
+import { supabase } from './lib/supabase';
+import type { User } from '@supabase/supabase-js';
+
 
 function App() {
-  const [query, setQuery] = useState('');
-  const [analyzing, setAnalyzing] = useState(false);
+  const { currentView, hasSeenWalkthrough } = useStore();
+  const [user, setUser] = React.useState<User | null>(null);
 
-  const handleSearch = (searchQuery: string) => {
-    setQuery(searchQuery);
-    setAnalyzing(true);
-    setTimeout(() => setAnalyzing(false), 1500);
+  const renderView = () => {
+    switch (currentView) {
+      case 'welcome':
+        return <WelcomePage user={user} />;
+      case 'home':
+        return <HomePage />;
+      case 'projects':
+        return <ProjectsPage />;
+      case 'my-projects':
+        return <MyProjectsPage />;
+      case 'templates':
+        return <TemplatesPage />;
+      case 'team':
+        return <TeamPage />;
+      case 'settings':
+        return <SettingsPage user={user}/>;
+      case 'token-usage':
+        return <TokenUsagePage />;
+      case 'library':
+        return <ContentLibrary />;
+      case 'concept-test':
+        return <ConceptTestPage />;
+      case 'api':
+        return <ApiPage />;
+      case 'knowledge-base':
+        return <KnowledgeBasePage />;
+      case 'custom-feature':
+        return <CustomFeaturePage />;
+      default:
+        return <WelcomePage user={user} />;
+    }
   };
 
+  React.useEffect(() => {
+      const fetchUser = async () => {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+            // No user session, proceed without user
+            setUser(null);
+        } else {
+          setUser(data.user);
+        }
+      };
+  
+      fetchUser();
+    }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Code2 className="h-8 w-8 text-indigo-600" />
-              <h1 className="text-xl font-bold text-gray-900">CodeAnalyzer</h1>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <SearchBar onSearch={handleSearch} analyzing={analyzing} />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-16rem)]">
-          <Chat query={query} />
-          <IDE query={query} />
-        </div>
-      </main>
-    </div>
+    <>
+      {!hasSeenWalkthrough && <Walkthrough />}
+      <Layout user={user} setUser={setUser}>
+        {renderView()}
+      </Layout>
+    </>
   );
 }
 

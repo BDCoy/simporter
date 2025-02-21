@@ -1,75 +1,172 @@
-import React, { useState } from 'react';
-import { Code, Copy, Check } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { CodeEditor } from "./CodeEditor";
+import { DataView } from "./DataView";
+import { DocumentView } from "./DocumentView";
+import { QAView } from "./QAView";
+import { FileTree } from "./FileTree";
+import {
+  Code,
+  Database,
+  Presentation as PresentationIcon,
+  FileText,
+  HelpCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useMessagesStore } from "@/lib/messages";
+import { supabase } from "@/lib/supabase";
+import { Project } from "@/lib/services/project";
+import PPTXEditor from "./PPTXEditor";
+import { Message } from "@/pages/ProjectsPage";
 
-interface IDEProps {
-  query: string;
+type ViewType = "code" | "data" | "slides" | "document" | "qa";
+
+interface ViewOption {
+  id: ViewType;
+  label: string;
+  icon: React.ElementType;
 }
 
-function IDE({ query }: IDEProps) {
-  const [copied, setCopied] = useState(false);
+interface IDEProps {
+  project?: Project;
+  initialContext?: Record<string, any>;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+}
 
-  const handleCopy = async () => {
-    const code = document.querySelector('pre code')?.textContent;
-    if (code) {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+const viewOptions: ViewOption[] = [
+  { id: "code", label: "Code", icon: Code },
+  { id: "data", label: "Data", icon: Database },
+  { id: "slides", label: "Slides", icon: PresentationIcon },
+  { id: "document", label: "Document", icon: FileText },
+  { id: "qa", label: "Q&A", icon: HelpCircle },
+];
+
+export function IDE({ project, messages }: IDEProps) {
+  const [activeView, setActiveView] = useState<ViewType>("code");
+  const [isFileTreeCollapsed, setIsFileTreeCollapsed] = useState(false);
+  const [slides, setSlides] = useState<any[]>([]);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [data, setData] = useState<string>("");
+  const [qAndA, setQAndA] = useState<
+    Array<{ question: string; answer: string }>
+  >([]);
+  const [executiveSummary, setExecutiveSummary] = useState("");
+
+
+  useEffect(() => {
+    fetchLastMessageFromDatabase();
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      updateStateFromMessage(messages);
+    }
+  }, [messages]);
+
+  const fetchLastMessageFromDatabase = async () => {
+    const { data, error } = await supabase
+      .from("messages")
+      .select("*")
+      .eq("project_id", project.id)
+      .eq("type", "assistant")
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.error("Error fetching last message:", error);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      updateStateFromMessage(data);
+    }
+  };
+
+  const updateStateFromMessage = (messages: any[]) => {
+    const lastMessage = messages[0];
+    if (!lastMessage) return;
+    try {
+      const parsedJson = JSON.parse(lastMessage.content);
+      if (parsedJson.deliverables) {
+        setCode(parsedJson.deliverables.code?.content || "");
+        setSlides(parsedJson.deliverables.slides?.slides || []);
+        setData(parsedJson.deliverables.data || "");
+        setQAndA(parsedJson.deliverables.q_and_a || []);
+        setExecutiveSummary(parsedJson.deliverables.executive_summary || "");
+      }
+    } catch (error) {
+      console.error("Failed to parse message content:", error);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full">
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Code className="h-5 w-5 text-indigo-600" />
-            <h2 className="text-lg font-medium text-gray-900">Code Editor</h2>
-          </div>
-          <button 
-            onClick={handleCopy}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Copy code"
-          >
-            {copied ? (
-              <Check className="h-5 w-5 text-green-500" />
-            ) : (
-              <Copy className="h-5 w-5 text-gray-500" />
-            )}
-          </button>
+    <div className="flex h-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+      {/* File Tree Sidebar */}
+      <div
+        className={cn(
+          "flex-shrink-0 border-r border-gray-200 dark:border-gray-700 transition-all duration-300",
+          isFileTreeCollapsed ? "w-0" : "w-64"
+        )}
+      >
+        <div className="h-full">
+          <FileTree onSelect={setSelectedFile} selectedFile={selectedFile} />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 font-mono text-sm">
-        <pre className="bg-gray-50 p-4 rounded-lg">
-          <code className="text-gray-800">
-            {`// Example authentication middleware
-function authMiddleware(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-  
-  try {
-    const decoded = jwt.verify(token, 'secret-key');
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
-  }
-}`}
-          </code>
-        </pre>
-      </div>
+      {/* Collapse/Expand Button */}
+      <button
+        onClick={() => setIsFileTreeCollapsed(!isFileTreeCollapsed)}
+        className="absolute left-[320px] top-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-r p-1 shadow-sm"
+      >
+        {isFileTreeCollapsed ? (
+          <ChevronRight className="w-4 h-4 text-gray-500" />
+        ) : (
+          <ChevronLeft className="w-4 h-4 text-gray-500" />
+        )}
+      </button>
 
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
-        <div className="flex items-center space-x-2 text-sm text-gray-500">
-          <span className="font-medium">Language:</span>
-          <span>TypeScript</span>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* View Selector */}
+        <div className="flex border-b border-gray-200 dark:border-gray-700">
+          {viewOptions.map((option) => (
+            <button
+              key={option.id}
+              onClick={() => setActiveView(option.id)}
+              className={cn(
+                "flex items-center space-x-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors",
+                activeView === option.id
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              )}
+            >
+              <option.icon className="w-4 h-4" />
+              <span>{option.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* View Content */}
+        <div className="flex-1 overflow-y-auto">
+          {activeView === "code" && (
+            <CodeEditor
+              value={code}
+              onChange={(value) => setCode(value || "")}
+              language="typescript"
+            />
+          )}
+          {activeView === "data" && <DataView data={data} />}
+          {/* {activeView === "slides" && <Presentation slides={slides} />} */}
+          {activeView === "slides" && <PPTXEditor slidesData={slides} />}
+          {activeView === "document" && (
+            <DocumentView content={executiveSummary} />
+          )}
+          {activeView === "qa" && <QAView questions={qAndA} />}
         </div>
       </div>
     </div>
   );
 }
-
-export default IDE
