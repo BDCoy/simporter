@@ -1,7 +1,33 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions" # Moved this inside the first [build] block
 
 [build.environment]
   NODE_VERSION = "20"
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
+
+# Handle all routes for SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
+
+# Handle 404s (optional since SPA routing should handle this)
+[[redirects]]
+  from = "/404"
+  to = "/index.html"
+  status = 200
+
+# Security headers for enhanced protection
+[[headers]]
+  for = "/*"
+    [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "frame-ancestors 'none'"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Cache-Control = "public, max-age=0, must-revalidate"
