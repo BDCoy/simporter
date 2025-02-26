@@ -2,6 +2,7 @@
 
 import React, { ReactNode } from "react";
 import "./globals.css"; // Global Tailwind styles
+import { AuthProvider } from "@/context/AuthContext";
 
 // Global header & sidebar components:
 import HeaderLayout from "@/components/layout/header/HeaderLayout";
@@ -15,19 +16,22 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-white text-gray-900 dark:text-gray-100">
-        {/* Page Wrapper with flex */}
-        <div className="flex min-h-screen">
-          {/* Main area (no extra left container) */}
-          <div className="flex-1 flex flex-col md:ml-64">
-            {/* Global Header */}
-            <HeaderLayout />
+        {/* Auth Provider */}
+        <AuthProvider>
+          {/* Page Wrapper with flex */}
+          <div className="flex min-h-screen">
+            {/* Main area (no extra left container) */}
+            <div className="flex-1 flex flex-col md:ml-64">
+              {/* Global Header */}
+              <HeaderLayout />
 
-            {/* Main Content */}
-            <main className="overflow-y-auto p-4">
-              {children}
-            </main>
+              {/* Main Content */}
+              <main className="overflow-y-auto p-4">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
+        </AuthProvider>
       </body>
     </html>
   );
