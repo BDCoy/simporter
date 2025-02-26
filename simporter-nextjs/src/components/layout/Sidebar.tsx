@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Home,
   Folders,
@@ -12,7 +13,8 @@ import {
   HelpCircle,
   ChevronRight,
   X,
-  ChevronLeft
+  ChevronLeft,
+  Cog
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,19 +25,22 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { id: "maple-1", name: "Maple-1", icon: Home, href: "/maple-1" },
+  { id: "home", name: "Home", icon: Home, href: "/" },
+  { id: "maple-1", name: "Maple-1", icon: Home, href: "/maple-1" }, // icon should change
   { id: "my-projects", name: "My Projects", icon: Folders, href: "/my-projects" },
   { id: "navigation", name: "Navigation", icon: LayoutTemplate, href: "/navigation" },
   { id: "trusted-by", name: "Trusted by", icon: Book, href: "/trusted-by" },
   { id: "library", name: "Library", icon: Library, href: "/library" },
   { id: "benefits", name: "Benefits", icon: Beaker, href: "/benefits" },
   { id: "features", name: "Features", icon: HelpCircle, href: "/features" },
+  { id: "settings", name: "Settings", icon: Cog, href: "/settings" },
   { id: "start-free", name: "Start free", icon: ChevronRight, href: "/start-free" },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose, onExpandedChange }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const pathname = usePathname();
 
   // Expand sidebar on hover
   useEffect(() => {
@@ -112,6 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose, onExpandedChange }
             href={item.href}
             className={cn(
               "flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+              pathname === item.href ? "bg-gray-200 dark:bg-gray-700" : "",
               "text-gray-700 dark:text-gray-300 group"
             )}
             title={item.name}
