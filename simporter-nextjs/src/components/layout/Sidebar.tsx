@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 interface SidebarProps {
   isMobile?: boolean;
   onClose?: () => void;
+  onExpandedChange?: (expanded: boolean) => void;
 }
 
 const navigation = [
@@ -32,33 +33,43 @@ const navigation = [
   { id: "start-free", name: "Start free", icon: ChevronRight, href: "/start-free" },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose, onExpandedChange }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  
+
   // Expand sidebar on hover
   useEffect(() => {
     if (isHovering && !isMobile) {
-      const timer = setTimeout(() => setIsExpanded(true), 200);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        setIsExpanded(true)
+        onExpandedChange?.(true)
+      }, 200)
+      return () => clearTimeout(timer)
     } else if (!isHovering && !isMobile) {
-      const timer = setTimeout(() => setIsExpanded(false), 300);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        setIsExpanded(false)
+        onExpandedChange?.(false)
+      }, 300)
+      return () => clearTimeout(timer)
     }
-  }, [isHovering, isMobile]);
+  }, [isHovering, isMobile, onExpandedChange])
 
   // Function to handle mouse enter/leave
   const handleMouseEnter = () => setIsHovering(true);
   const handleMouseLeave = () => setIsHovering(false);
 
   // Toggle sidebar expansion manually
-  const toggleSidebar = () => setIsExpanded(!isExpanded);
+  const toggleSidebar = () => {
+    const newExpanded = !isExpanded
+    setIsExpanded(newExpanded)
+    onExpandedChange?.(newExpanded)
+  }
 
   return (
     <aside
       className={cn(
-        "h-full flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 relative",
-        isMobile ? "w-64" : isExpanded ? "w-64" : "w-16"
+        "h-full flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300",
+        isMobile ? "w-64" : isExpanded ? "w-64" : "w-16",
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -75,12 +86,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile, onClose }) => {
 
       {/* Desktop toggle button */}
       {!isMobile && (
-        <button 
+        <button
           onClick={toggleSidebar}
           className="absolute right-0 top-4 -mr-3 bg-white dark:bg-gray-800 rounded-full p-1 shadow-md border border-gray-200 dark:border-gray-700 z-10"
         >
-          {isExpanded ? 
-            <ChevronLeft className="w-4 h-4 text-gray-500" /> : 
+          {isExpanded ?
+            <ChevronLeft className="w-4 h-4 text-gray-500" /> :
             <ChevronRight className="w-4 h-4 text-gray-500" />
           }
         </button>
