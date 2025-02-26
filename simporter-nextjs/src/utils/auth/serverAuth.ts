@@ -13,10 +13,15 @@ export const signInWithGoogle = async () => {
     },
   })
   if (error) {
-    return encodedRedirect("error", "/sign-in", error.message);
+    console.log(error)
+    return { data: null, error };
   }
 
-  return redirect(data.url)
+  if (!data) {
+    return { data: null, error: new Error("No data returned from sign-in") };
+  }
+
+  return redirect(data.url);
 }
 
 export const signInWithMicrosoft = async () => {
@@ -29,10 +34,13 @@ export const signInWithMicrosoft = async () => {
       redirectTo: authCallbackUrl, // Specify the custom callback route
     },
   });
-  
-
   if (error) {
-    return encodedRedirect("error", "/sign-in", error.message);
+    console.log(error)
+    return { data: null, error };
+  }
+
+  if (!data) {
+    return { data: null, error: new Error("No data returned from sign-in") };
   }
 
   return redirect(data.url);
