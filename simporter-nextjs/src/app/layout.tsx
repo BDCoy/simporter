@@ -2,11 +2,13 @@
 
 import React, { ReactNode } from "react";
 import "./globals.css"; // Global Tailwind styles
+import { AuthProvider } from "@/context/AuthContext";
 
 // Global header & sidebar components:
 import HeaderLayout from "@/components/layout/header/HeaderLayout";
 import Sidebar from "@/components/layout/Sidebar";
 import { SidebarProvider, useSidebar } from "@/context/SidebarContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 interface RootLayoutProps {
   children: ReactNode;
@@ -40,9 +42,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-white text-gray-900 dark:text-gray-100">
-        <SidebarProvider>
-          <LayoutContent>{children}</LayoutContent>
-        </SidebarProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <SidebarProvider>
+              <LayoutContent>{children}</LayoutContent>
+            </SidebarProvider>
+          </NotificationProvider>
+        </AuthProvider>
       </body>
     </html>
   );
