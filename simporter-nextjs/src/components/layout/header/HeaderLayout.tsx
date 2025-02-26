@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 import { AuthModal } from "@/components/auth/AuthModal"
+import { useNotifications } from "@/context/NotificationContext"
+
 export default function HeaderLayout() {
   const router = useRouter()
   const [showReferralModal, setShowReferralModal] = useState(false)
@@ -17,25 +19,15 @@ export default function HeaderLayout() {
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const { pendingNotifications, pastNotifications, markAsRead, clearAll } = useNotifications();
 
   const profileDropdownRef = useRef<HTMLDivElement>(null)
 
-  const { user, signOut } = useAuth()
+  const { user, userData, signOut } = useAuth()
   console.log("User object:", user)
+  console.log("User data:", userData)
 
-  const [userData, setUserData] = useState({
-    level: 0,
-    maxLevel: 99,
-    currentXP: 0,
-    xpForNextLevel: 1000,
-    streak: 0,
-    tokens: 0,
-    dogLevel: "Newf Puppy",
-    notifications: 0,
-    recentAchievements: [],
-  })
-
-  const progressPercentage = (userData.currentXP / userData.xpForNextLevel) * 100
+  const progressPercentage = (userData.current_xp / userData.xp_for_next_level) * 100
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -70,36 +62,6 @@ export default function HeaderLayout() {
     }
   }
 
-  useEffect(() => {
-    async function fetchUserData() {
-      if (user) {
-        try {
-          const { data, error } = await supabase.from("user_profiles").select("*").eq("id", user.id).single()
-
-          if (error) throw error
-
-          if (data) {
-            setUserData({
-              level: data.level || 0,
-              maxLevel: 99,
-              currentXP: data.current_xp || 0,
-              xpForNextLevel: data.xp_for_next_level || 1000,
-              streak: data.streak || 0,
-              tokens: data.tokens || 0,
-              dogLevel: data.dog_level || "Newf Puppy",
-              notifications: data.notifications || 0,
-              recentAchievements: data.achievements || [],
-            })
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error)
-        }
-      }
-    }
-
-    fetchUserData()
-  }, [user])
-
   return (
     <>
       <header className="flex items-center px-5 h-16 bg-white/90 backdrop-blur-sm border-b border-gray-100 justify-between">
@@ -108,7 +70,8 @@ export default function HeaderLayout() {
           <img
             src="https://simporter.com/wp-content/uploads/2025/01/Simporter-Logo-Black-Text.svg"
             alt="Simporter Logo"
-            className="h-14 w-auto"
+            className="h-14 w-auto cursor-pointer"
+            onClick={() => router.push('/')}
           />
         </div>
 
@@ -159,7 +122,7 @@ export default function HeaderLayout() {
                   />
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {userData.currentXP}/{userData.xpForNextLevel} XP
+                  {userData.current_xp}/{userData.xp_for_next_level} XP
                 </div>
               </div>
             </button>
@@ -195,9 +158,8 @@ export default function HeaderLayout() {
                   3 0 11-6 0v-1m6 0H9"
                 />
               </svg>
-              {userData.notifications > 0 && (
+              {pendingNotifications.length > 0 && (
                 <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                  {userData.notifications}
                 </span>
               )}
             </button>
@@ -371,7 +333,6 @@ export default function HeaderLayout() {
       {showReferralModal && <ReferralModal onClose={() => setShowReferralModal(false)} />}
       {showGamificationPanel && (
         <GamificationPanel
-          userData={userData}
           onClose={() => setShowGamificationPanel(false)}
           onViewAllAchievements={() => {
             setShowGamificationPanel(false)

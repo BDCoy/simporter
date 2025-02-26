@@ -4,13 +4,8 @@ import { encodedRedirect } from "@/utils/utils";
 import { redirect } from "next/navigation";
 
 export const signInWithGoogle = async () => {
-  // sign in with google
-  console.log("signInWithGoogle called from authmodal")
   const supabase = await createClient()
-
   const auth_callback_url = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
-  console.log("auth_callback_url", auth_callback_url)
-
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -40,9 +35,7 @@ export const signInWithMicrosoft = async () => {
     return encodedRedirect("error", "/sign-in", error.message);
   }
 
-  if (data) {
-    redirect(data.url);
-  }
+  return redirect(data.url);
 };
 
 

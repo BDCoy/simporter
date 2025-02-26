@@ -2,6 +2,8 @@
 
 import React from "react";
 import { cn } from "@/lib/utils"; // Use your cn helper
+import { useAuth } from "@/context/AuthContext"
+
 
 // Dummy definitions to satisfy the imports (adjust as needed)
 const avatarMapping: Record<string, string> = {
@@ -22,33 +24,21 @@ interface Achievement {
   badge?: string;
 }
 
-interface UserData {
-  level: number;
-  maxLevel: number;
-  currentXP: number;
-  xpForNextLevel: number;
-  streak: number;
-  tokens: number;
-  recentAchievements: Achievement[];
-  dogLevel: string;
-}
-
 interface GamificationPanelProps {
-  userData: UserData;
   onClose: () => void;
   onViewAllAchievements: () => void;
 }
 
 export function GamificationPanel({
-  userData,
   onClose,
   onViewAllAchievements,
 }: GamificationPanelProps) {
+  const { userData } = useAuth();
   if (!userData) return null;
 
-  const progressPercentage = (userData.currentXP / userData.xpForNextLevel) * 100;
+  const progressPercentage = (userData.current_xp / userData.xp_for_next_level) * 100;
   const currentBadge = getBadge(userData.level);
-  const currentAvatar = avatarMapping[userData.dogLevel] || "/images/default-avatar.png";
+  const currentAvatar = avatarMapping[userData.dog_level] || "/images/default-avatar.png";
 
   const achievementsWithBadge: Achievement[] = [
     {
@@ -104,7 +94,7 @@ export function GamificationPanel({
             <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-blue-100">
               <img
                 src={currentAvatar}
-                alt={userData.dogLevel}
+                alt={userData.dog_level}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -125,11 +115,11 @@ export function GamificationPanel({
               Level {userData.level}
             </span>
             <span className="text-sm md:text-base text-gray-500">
-              ({userData.dogLevel})
+              ({userData.dog_level})
             </span>
           </div>
           <div className="text-xs md:text-sm text-gray-500 mb-2">
-            {userData.currentXP} / {userData.xpForNextLevel} XP
+            {userData.current_xp} / {userData.xp_for_next_level} XP
           </div>
           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
@@ -179,7 +169,7 @@ export function GamificationPanel({
             </svg>
             <div>
               <h4 className="text-xs text-gray-500">Token Balance</h4>
-              <p className="text-sm md:text-base font-bold text-gray-900">{userData.tokens}</p>
+              <p className="text-sm md:text-base font-bold text-gray-900">{userData.remaining_tokens}</p>
             </div>
           </div>
         </div>

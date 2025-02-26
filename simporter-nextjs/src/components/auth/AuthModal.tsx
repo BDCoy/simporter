@@ -14,8 +14,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [error, setError] = React.useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
-    const data = await signInWithGoogle();
-    if ('error' in data) {
+    const { error } = await signInWithGoogle();
+    if (error) {
       setError('Google sign in failed');
     } else {
       onClose();
@@ -23,11 +23,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   const handleMicrosoftSignIn = async () => {
-    const data = await signInWithMicrosoft();
-    if (!data) {
+    const { error } = await signInWithMicrosoft();
+    if (error) {
         setError('Microsoft sign in failed');
-    } else if ('error' in data) {
-      setError('Microsoft sign in failed');
     } else {
       onClose();
     }

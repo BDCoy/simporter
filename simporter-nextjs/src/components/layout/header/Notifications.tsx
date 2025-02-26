@@ -2,57 +2,16 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-
-interface Notification {
-  id: string;
-  type: "achievement" | "system" | "reward" | "social";
-  title: string;
-  message: string;
-  timestamp: Date;
-  read: boolean;
-  icon?: string;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
-}
+import { useNotifications } from "@/context/NotificationContext";
 
 interface NotificationsPanelProps {
   onClose: () => void;
 }
 
 export default function NotificationsPanel({ onClose }: NotificationsPanelProps) {
-  const notifications: Notification[] = [
-    {
-      id: "1",
-      type: "achievement",
-      title: "5-Day Streak!",
-      message: "You have logged in for 5 days in a row",
-      timestamp: new Date(Date.now() - 1000 * 60 * 30),
-      read: false,
-      icon: "🔥",
-    },
-    {
-      id: "2",
-      type: "reward",
-      title: "Level Up!",
-      message: "You've reached Level 5 - Shiba Inu",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-      read: false,
-      icon: "⭐",
-    },
-    {
-      id: "3",
-      type: "social",
-      title: "New Referral",
-      message: "John D. joined using your referral link",
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
-      read: true,
-      icon: "👥",
-    },
-  ];
+  const { pendingNotifications, pastNotifications, markAsRead, clearAll } = useNotifications();
 
-  const getNotificationColor = (type: Notification["type"]) => {
+  const getNotificationColor = (type: string) => {
     switch (type) {
       case "achievement":
         return "bg-green-100 text-green-800";
@@ -82,6 +41,15 @@ export default function NotificationsPanel({ onClose }: NotificationsPanelProps)
     }
   };
 
+  const handleMarkAllAsRead = async () => {
+    const ids = pendingNotifications.map((notification) => notification.id);
+    await markAsRead(ids);
+  };
+
+  const handleMarkAsRead = async (id: string) => {
+    await markAsRead([id]);
+  };
+
   return (
     <div className="absolute top-[64px] right-0 w-full md:w-[400px] bg-white border-l border-b border-gray-200 shadow-lg z-50">
       <div className="p-4">
@@ -101,12 +69,11 @@ export default function NotificationsPanel({ onClose }: NotificationsPanelProps)
 
         {/* Notifications list */}
         <div className="space-y-4">
-          {notifications.map((notification) => (
+          {pendingNotifications.map((notification) => (
             <div
               key={notification.id}
               className={cn(
-                "p-4 rounded-lg transition-colors",
-                notification.read ? "bg-gray-50" : "bg-white border border-gray-200"
+                "p-4 rounded-lg transition-colors bg-white border border-gray-200"
               )}
             >
               <div className="flex items-start gap-3">
@@ -116,7 +83,7 @@ export default function NotificationsPanel({ onClose }: NotificationsPanelProps)
                     getNotificationColor(notification.type)
                   )}
                 >
-                  <span className="text-lg">{notification.icon}</span>
+                  <span className="text-lg">{notification.type}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start">
@@ -125,7 +92,52 @@ export default function NotificationsPanel({ onClose }: NotificationsPanelProps)
                       <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
                     </div>
                     <span className="text-xs text-gray-500 whitespace-nowrap ml-4">
-                      {formatTimestamp(notification.timestamp)}
+                      {formatTimestamp(new Date(notification.timestamp))}
+                    </span>
+                  </div>
+                  {notification.action && (
+                    // TODO: THIS IS NOT IMPLEMENTED
+                    <button
+                      onClick={notification.action.onClick}
+                      className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      {notification.action.label}
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleMarkAsRead(notification.id)}
+                  className="ml-4 text-sm font-medium text-blue-600 hover:text-blue-800"
+                >
+                  Mark as read
+                </button>
+              </div>
+            </div>
+          ))}
+          {pastNotifications.map((notification) => (
+            <div
+              key={notification.id}
+              className={cn(
+                "p-4 rounded-lg transition-colors bg-gray-50"
+              )}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className={cn(
+                    "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
+                    getNotificationColor(notification.type)
+                  )}
+                >
+                  <span className="text-lg">{notification.type}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">{notification.title}</h4>
+                      <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                    </div>
+                    <span className="text-xs text-gray-500 whitespace-nowrap ml-4">
+                      {formatTimestamp(new Date(notification.timestamp))}
                     </span>
                   </div>
                   {notification.action && (
@@ -137,9 +149,6 @@ export default function NotificationsPanel({ onClose }: NotificationsPanelProps)
                     </button>
                   )}
                 </div>
-                {!notification.read && (
-                  <div className="flex-shrink-0 w-2 h-2 rounded-full bg-blue-600" />
-                )}
               </div>
             </div>
           ))}
@@ -147,7 +156,10 @@ export default function NotificationsPanel({ onClose }: NotificationsPanelProps)
 
         {/* Footer */}
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <button className="w-full text-center text-sm font-medium text-gray-700 hover:text-gray-900">
+          <button
+            onClick={handleMarkAllAsRead}
+            className="w-full text-center text-sm font-medium text-gray-700 hover:text-gray-900"
+          >
             Mark all as read
           </button>
         </div>
