@@ -22,19 +22,19 @@ export interface CommandPrompt {
         {
           command: "/KPI",
           description: "What motivates consumers to choose {placeholder}?",
-          placeholder: "plant-based foods"
+          placeholder: "plant-based foods",
         },
         {
           command: "/Switch",
           description: "Why are customers switching to {placeholder}?",
-          placeholder: "subscription services"
+          placeholder: "subscription services",
         },
         {
           command: "/Loyalty",
           description: "Which factors drive brand loyalty in the {placeholder}?",
-          placeholder: "beauty industry"
-        }
-      ]
+          placeholder: "beauty industry",
+        },
+      ],
     },
     {
       id: "brand-awareness",
@@ -44,19 +44,19 @@ export interface CommandPrompt {
         {
           command: "/Recognition",
           description: "How well do consumers recognize our {placeholder}?",
-          placeholder: "logo and packaging"
+          placeholder: "logo and packaging",
         },
         {
           command: "/Recall",
           description: "What percentage of shoppers recall our {placeholder}?",
-          placeholder: "recent ad campaign"
+          placeholder: "recent ad campaign",
         },
         {
           command: "/Compare",
           description: "How does our brand reputation compare to {placeholder}?",
-          placeholder: "competitors"
-        }
-      ]
+          placeholder: "competitors",
+        },
+      ],
     },
     {
       id: "journey-mapping",
@@ -66,19 +66,19 @@ export interface CommandPrompt {
         {
           command: "/Discovery",
           description: "How do consumers discover new {placeholder}?",
-          placeholder: "skincare products"
+          placeholder: "skincare products",
         },
         {
           command: "/Decision",
           description: "What touchpoints influence {placeholder} decisions?",
-          placeholder: "car-buying"
+          placeholder: "car-buying",
         },
         {
           command: "/Dropoff",
           description: "Where do online shoppers drop off during {placeholder}?",
-          placeholder: "checkout"
-        }
-      ]
+          placeholder: "checkout",
+        },
+      ],
     },
     {
       id: "voc",
@@ -88,19 +88,19 @@ export interface CommandPrompt {
         {
           command: "/Complaints",
           description: "What complaints do users have about our {placeholder}?",
-          placeholder: "app"
+          placeholder: "app",
         },
         {
           command: "/Experience",
           description: "How do customers describe their ideal {placeholder}?",
-          placeholder: "shopping experience"
+          placeholder: "shopping experience",
         },
         {
           command: "/Requests",
           description: "What product features are customers requesting most often in {placeholder}?",
-          placeholder: "category"
-        }
-      ]
+          placeholder: "category",
+        },
+      ],
     },
     {
       id: "trends",
@@ -110,19 +110,19 @@ export interface CommandPrompt {
         {
           command: "/Sustainability",
           description: "How are attitudes toward {placeholder} evolving?",
-          placeholder: "sustainability"
+          placeholder: "sustainability",
         },
         {
           command: "/GenZ",
           description: "What {placeholder} trends are gaining traction with Gen Z?",
-          placeholder: "wellness"
+          placeholder: "wellness",
         },
         {
           command: "/Remote",
           description: "How is remote work impacting {placeholder} spending?",
-          placeholder: "home improvement"
-        }
-      ]
+          placeholder: "home improvement",
+        },
+      ],
     },
     {
       id: "segmentation",
@@ -132,19 +132,19 @@ export interface CommandPrompt {
         {
           command: "/Users",
           description: "Who are the heavy users of {placeholder}?",
-          placeholder: "energy drinks"
+          placeholder: "energy drinks",
         },
         {
           command: "/Demographics",
           description: "How do suburban vs. urban customers differ in {placeholder}?",
-          placeholder: "grocery shopping"
+          placeholder: "grocery shopping",
         },
         {
           command: "/Interest",
           description: "Which demographics are most interested in {placeholder}?",
-          placeholder: "electric vehicles"
-        }
-      ]
+          placeholder: "electric vehicles",
+        },
+      ],
     },
     {
       id: "feature-testing",
@@ -154,19 +154,19 @@ export interface CommandPrompt {
         {
           command: "/Usage",
           description: "Would customers use a {placeholder}?",
-          placeholder: "voice-activated coffee machine"
+          placeholder: "voice-activated coffee machine",
         },
         {
           command: "/Preference",
           description: "Do users prefer a {placeholder} in cars?",
-          placeholder: "touch screen or physical buttons"
+          placeholder: "touch screen or physical buttons",
         },
         {
           command: "/Priority",
           description: "How important is {placeholder} for water filters?",
-          placeholder: "automatic refilling"
-        }
-      ]
+          placeholder: "automatic refilling",
+        },
+      ],
     },
     {
       id: "package-testing",
@@ -176,19 +176,19 @@ export interface CommandPrompt {
         {
           command: "/Usability",
           description: "Do customers find the new {placeholder} easier to open?",
-          placeholder: "cereal box"
+          placeholder: "cereal box",
         },
         {
           command: "/Design",
           description: "Which {placeholder} is most ergonomic for athletes?",
-          placeholder: "bottle shape"
+          placeholder: "bottle shape",
         },
         {
           command: "/Sustainable",
           description: "How does {placeholder} influence purchase decisions?",
-          placeholder: "sustainable packaging"
-        }
-      ]
+          placeholder: "sustainable packaging",
+        },
+      ],
     },
     {
       id: "price-testing",
@@ -198,19 +198,19 @@ export interface CommandPrompt {
         {
           command: "/Willingness",
           description: "How much are consumers willing to pay for {placeholder}?",
-          placeholder: "plant-based burgers"
+          placeholder: "plant-based burgers",
         },
         {
           command: "/Premium",
           description: "Would a premium version of our {placeholder} be appealing?",
-          placeholder: "subscription service"
+          placeholder: "subscription service",
         },
         {
           command: "/Threshold",
           description: "What is the price threshold where demand drops off for {placeholder}?",
-          placeholder: "fitness trackers"
-        }
-      ]
+          placeholder: "fitness trackers",
+        },
+      ],
     },
     {
       id: "message-testing",
@@ -220,28 +220,29 @@ export interface CommandPrompt {
         {
           command: "/Slogan",
           description: "Which slogan resonates most with {placeholder}?",
-          placeholder: "eco-conscious consumers"
+          placeholder: "eco-conscious consumers",
         },
         {
           command: "/Engagement",
           description: "Does {placeholder} improve engagement with our social media ads?",
-          placeholder: "humor"
+          placeholder: "humor",
         },
         {
           command: "/Click",
           description: "Which headline drives more clicks for {placeholder}?",
-          placeholder: "online retailers"
-        }
-      ]
-    }
+          placeholder: "online retailers",
+        },
+      ],
+    },
   ];
   
   // Helper function to get all commands as a flat array
   export const getAllCommands = (): CommandPrompt[] => {
-    return commandCategories.flatMap(category => category.commands);
+    return commandCategories.flatMap((category) => category.commands);
   };
   
   // Helper function to get a specific command by its command string
   export const getCommandByName = (commandName: string): CommandPrompt | undefined => {
-    return getAllCommands().find(cmd => cmd.command === commandName);
+    return getAllCommands().find((cmd) => cmd.command === commandName);
   };
+  

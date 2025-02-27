@@ -6,12 +6,14 @@ export interface InspiringCarouselProps {
   prompts: string[];
   autoRotateInterval?: number;
   onPromptClick?: (prompt: string) => void;
+  setSearchQuery?: (query: string) => void; // Added a new prop to set the search query directly
 }
 
 const InspiringCarousel: React.FC<InspiringCarouselProps> = ({
   prompts,
   autoRotateInterval = 3000,
   onPromptClick,
+  setSearchQuery,
 }) => {
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -25,6 +27,18 @@ const InspiringCarousel: React.FC<InspiringCarouselProps> = ({
     }, autoRotateInterval);
     return () => clearInterval(interval);
   }, [isPaused, prompts.length, autoRotateInterval]);
+
+  const handlePromptClick = (prompt: string) => {
+    // Use the new setSearchQuery prop if available
+    if (setSearchQuery) {
+      setSearchQuery(prompt);
+    }
+    
+    // Still call the original onPromptClick for backward compatibility
+    if (onPromptClick) {
+      onPromptClick(prompt);
+    }
+  };
 
   return (
     <div
@@ -58,9 +72,7 @@ const InspiringCarousel: React.FC<InspiringCarouselProps> = ({
         <div className="flex-1 px-8 text-center">
           <p
             className="text-lg text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
-            onClick={() =>
-              onPromptClick && onPromptClick(prompts[currentPromptIndex])
-            }
+            onClick={() => handlePromptClick(prompts[currentPromptIndex])}
           >
             {prompts[currentPromptIndex]}
           </p>
