@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { TaskStatus } from './CollapsibleTaskList';
-import ExecutionPanel from './ExecutionPanel';
+import ExecutionPanel from '../Tabs/ExecutionPanel';
 
 interface ChatMessageWithTasksProps {
   message: string;

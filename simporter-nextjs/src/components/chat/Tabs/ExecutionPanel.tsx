@@ -1,14 +1,17 @@
 "use client"
 
 import React, { useState } from 'react';
-import CollapsibleTaskList, { TaskStatus } from './CollapsibleTaskList';
+import CollapsibleTaskList, { TaskStatus } from '../ChatElements/CollapsibleTaskList';
 
 interface ExecutionPanelProps {
-  initialMessage: string;
+  initialMessage?: string;
   onTaskAction?: (taskId: string, action: string) => void;
 }
 
-export default function ExecutionPanel({ initialMessage, onTaskAction }: ExecutionPanelProps) {
+export default function ExecutionPanel({ 
+  initialMessage = "I found some issues with your dependencies and configuration", 
+  onTaskAction 
+}: ExecutionPanelProps) {
   // Example task lists - in a real app, these would be dynamically generated
   const [fixDependenciesTasks] = useState<TaskStatus[]>([
     { 
@@ -81,7 +84,7 @@ export default function ExecutionPanel({ initialMessage, onTaskAction }: Executi
   ]);
 
   return (
-    <div className="space-y-4">
+    <div className="h-full overflow-auto p-4 space-y-4">
       <CollapsibleTaskList
         title="Show problems"
         message={initialMessage}

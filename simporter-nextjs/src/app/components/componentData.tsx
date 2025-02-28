@@ -15,13 +15,13 @@ import LandingBlock2 from "../../components/landingPage/LandingBlock2";
 // UI Components
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
-import ChatwithFileUpload from "../../components/ui/ChatwithFileUpload";
+import ChatwithFileUpload from "../../components/chat/ChatElements/ChatwithFileUpload";
 import ComponentDisplay from "../../components/ui/ComponentDisplay";
 import ComponentsDropdown from "../../components/ui/ComponentsDropdown";
 import Dropdown from "../../components/ui/Dropdown";
 import EnhancedSearchbar from "../../components/ui/EnhancedSearchbar";
 import Header from "../../components/ui/Header";
-import IDELayout from "../../components/ui/IDELayout";
+import IDELayout from "../../components/chat/IDELayout";
 import MainContent from "../../components/ui/MainContent";
 import PricingCards from "../../components/landingPage/PricingCards";
 import SSOLogin from "../../components/auth/SSOLogin";
@@ -29,26 +29,26 @@ import CompactSSOLogin from "../../components/auth/CompactSSOLogin";
 import CTABanner from "../../components/landingPage/CTABanner";
 import SiteFooter from "../../components/landingPage/SiteFooter";
 import ProjectCard from "../../components/ui/ProjectCard";
-import SearchBarWithCommands from "../../components/ui/SearchBarWithCommands";
+import SearchBarWithCommands from "../../components/maple-1/SearchBarWithCommands";
 import SearchInput from "../../components/ui/SearchInput";
-import Slides from "../../components/ui/Slides";
-import TaskList from "../../components/ui/TaskList";
-import ViewActions from "../../components/ui/ViewActions";
-import ViewTabs from "../../components/ui/ViewTabs";
-import VisualInspector from "../../components/ui/VisualInspector";
+import Slides from "../../components/chat/Tabs/Slides";
+import TaskList from "../../components/chat/Tabs/TaskList";
+import ViewActions from "../../components/chat/ViewActions";
+import ViewTabs from "../../components/chat/Tabs/ViewTabs";
+import VisualInspector from "../../components/chat/ChatElements/VisualInspector";
 import WelcomePage from "../../components/ui/WelcomePage";
 import InspiringCarousel from "@/components/ui/InspiringCarousel";
 import TrustedByBanner from "@/components/landingPage/TrustedByBanner";
 import ProjectGrid from "@/components/ui/ProjectGrid";
 
 // Chat Components
-import ChatMessageWithTasks from "../../components/chat/ChatMessageWithTasks";
-import CollapsibleTaskList from "../../components/chat/CollapsibleTaskList";
-import EnhancedChat from "../../components/chat/EnhancedChat";
-import ExecutionPanel from "../../components/chat/ExecutionPanel";
+import ChatMessageWithTasks from "../../components/chat/ChatElements/ChatMessageWithTasks";
+import CollapsibleTaskList from "../../components/chat/ChatElements/CollapsibleTaskList";
+import EnhancedChat from "../../components/chat/ChatElements/EnhancedChat";
+import ExecutionPanel from "../../components/chat/Tabs/ExecutionPanel";
 
 // CreateSlideModal (if needed)
-import CreateSlideModal from "../../components/ui/CreateSlideModal";
+import CreateSlideModal from "../../components/chat/Tabs/CreateSlideModal";
 
 export interface ShowcaseItem {
   type: string;

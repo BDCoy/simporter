@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 
 // UI Components
-import SearchBarWithCommands from "@/components/ui/SearchBarWithCommands";
+import SearchBarWithCommands from "@/components/maple-1/SearchBarWithCommands";
 import InspiringCarousel from "@/components/ui/InspiringCarousel";
 import ProjectCard, { Project as ProjectType } from "@/components/ui/ProjectCard";
 

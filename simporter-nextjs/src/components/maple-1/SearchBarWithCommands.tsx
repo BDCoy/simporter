@@ -21,9 +21,11 @@ import {
   MessageCircle,
   PenLine,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { commandCategories } from "@/data/commands";
+import { commandCategories, getAllCommands } from "@/data/commands";
 
 ////////////////////////////////////////////////////////////////////////////////
 // Type Definitions
@@ -46,17 +48,6 @@ type CommandItem = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Rotating Prompts (Key Drivers Analysis sample)
-////////////////////////////////////////////////////////////////////////////////
-
-const rotatingPrompts: string[] = [
-  "What motivates consumers to choose {plant-based foods}?",
-  "Why are customers switching to {subscription services}?",
-  "Which factors drive brand loyalty in the {beauty industry}?",
-];
-const ROTATION_INTERVAL_MS = 4000;
-
-////////////////////////////////////////////////////////////////////////////////
 // Flatten commandCategories into a flat array of CommandItem
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -70,6 +61,25 @@ const commandList: CommandItem[] = commandCategories.flatMap((cat) =>
     color: `text-${cat.color}-600`,
   }))
 );
+
+// Generate all prompts from the categories with more variety
+const allPrompts = getAllCommands().map((cmd, index) => {
+  // Create a unique color based on category and command
+  const category = commandCategories.find(cat => 
+    cat.commands.some(c => c.command === cmd.command)
+  );
+  
+  // Add variety to colors
+  const colorOptions = ['blue', 'green', 'purple', 'red', 'yellow', 'indigo', 'pink', 
+                        'amber', 'emerald', 'cyan', 'teal', 'lime', 'sky', 'orange',
+                        'rose', 'fuchsia', 'violet'];
+  const colorIndex = (index + (category?.id.length || 0)) % colorOptions.length;
+  
+  return {
+    text: cmd.placeholder ? cmd.description.replace("{placeholder}", `{${cmd.placeholder}}`) : cmd.description,
+    color: colorOptions[colorIndex]
+  };
+});
 
 ////////////////////////////////////////////////////////////////////////////////
 // Helper: Format command description using the placeholder value
@@ -97,21 +107,25 @@ export default function SearchBarWithCommands() {
   const [attachments, setAttachments] = useState<FileWithPreview[]>([]);
   const [showAttachments, setShowAttachments] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
+  const [carouselPosition, setCarouselPosition] = useState(0);
+
+  // Create duplicate prompts for infinite looping effect
+  const duplicatedPrompts = [...allPrompts, ...allPrompts];
+  
+  // Calculate items per row and total rows
+  const itemsPerRow = 2;
+  const totalRows = 2;
+  const visibleItems = itemsPerRow * totalRows;
 
   // Refs for handling outside clicks
   const containerRef = useRef<HTMLDivElement | null>(null);
   const commandsRef = useRef<HTMLDivElement | null>(null);
+  const carouselRef = useRef<HTMLDivElement | null>(null);
 
   // -------------------------------------------------------------------------
   // Effects
   // -------------------------------------------------------------------------
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPromptIndex((prev) => (prev + 1) % rotatingPrompts.length);
-    }, ROTATION_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, []);
+  // Removed this interval since we're using the autoScroll effect instead
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -186,10 +200,35 @@ export default function SearchBarWithCommands() {
     setSelectedCommandIdx(-1);
   }
 
-  function handleRotatingPromptClick() {
-    setSearchQuery(rotatingPrompts[currentPromptIndex]);
+  function handlePromptClick(text: string) {
+    setSearchQuery(text);
   }
 
+  function handleCarouselNavigation(direction: 'left' | 'right') {
+    if (direction === 'left') {
+      setCarouselPosition(prev => 
+        prev === 0 ? allPrompts.length - 1 : prev - 1
+      );
+    } else {
+      setCarouselPosition(prev => 
+        (prev + 1) % allPrompts.length
+      );
+    }
+  }
+  
+  // For continuous horizontal scrolling animation
+  const [autoScroll, setAutoScroll] = useState(true);
+
+  useEffect(() => {
+    if (!autoScroll) return;
+    
+    const animation = setInterval(() => {
+      setCarouselPosition(prev => (prev + 1) % (allPrompts.length || 1));
+    }, 2250); // Increased delay for slower animation
+    
+    return () => clearInterval(animation);
+  }, [autoScroll, allPrompts.length]);
+  
   async function handleSearch(e?: React.FormEvent) {
     if (e) e.preventDefault();
     if (!searchQuery.trim() || isProcessing) return;
@@ -276,6 +315,56 @@ export default function SearchBarWithCommands() {
     });
   }
 
+  // Function to get pastel background color based on the color string
+  function getBackgroundColor(colorName: string) {
+    const colorMap: Record<string, string> = {
+      'blue': 'bg-blue-100',
+      'green': 'bg-green-100',
+      'purple': 'bg-purple-100',
+      'red': 'bg-red-100',
+      'yellow': 'bg-yellow-100',
+      'indigo': 'bg-indigo-100',
+      'pink': 'bg-pink-100',
+      'amber': 'bg-amber-100',
+      'emerald': 'bg-emerald-100',
+      'cyan': 'bg-cyan-100',
+      'gray': 'bg-gray-100',
+      'teal': 'bg-teal-100',
+      'lime': 'bg-lime-100',
+      'sky': 'bg-sky-100',
+      'orange': 'bg-orange-100',
+      'rose': 'bg-rose-100',
+      'fuchsia': 'bg-fuchsia-100',
+      'violet': 'bg-violet-100',
+    };
+    
+    // Add more color variety by creating a deterministic but varied color assignment
+    const sum = colorName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const colorKeys = Object.keys(colorMap);
+    const colorIndex = sum % colorKeys.length;
+    
+    return colorMap[colorKeys[colorIndex]] || colorMap[colorName] || 'bg-gray-100';
+  }
+
+  // Get visible items for carousel - shows complete cards
+  const getVisibleItems = () => {
+    // Ensure we have enough prompts by making multiple copies 
+    const multipliedPrompts = [...allPrompts, ...allPrompts, ...allPrompts];
+    
+    // Create a section of the duplicated array starting from the current position
+    // Make sure to include enough items to fill the view (considering we show 4 items at a time)
+    const startIndex = carouselPosition % allPrompts.length;
+    const visibleSection = [...multipliedPrompts.slice(startIndex), ...multipliedPrompts].slice(0, visibleItems + 4);
+    
+    // Split into rows
+    const rows = [];
+    for (let i = 0; i < totalRows; i++) {
+      rows.push(visibleSection.slice(i * itemsPerRow, (i + 1) * itemsPerRow));
+    }
+    
+    return rows;
+  };
+
   // -------------------------------------------------------------------------
   // Render
   // -------------------------------------------------------------------------
@@ -300,16 +389,6 @@ export default function SearchBarWithCommands() {
           </div>
         </div>
       )}
-
-      {/* Rotating prompt */}
-      <div className="mb-3 text-center">
-        <div
-          className="cursor-pointer text-gray-800 dark:text-gray-400 font-medium transition-colors hover:text-black"
-          onClick={handleRotatingPromptClick}
-        >
-          {rotatingPrompts[currentPromptIndex]}
-        </div>
-      </div>
 
       {/* Main search input */}
       <form onSubmit={handleSearch} className="relative">
@@ -470,6 +549,65 @@ export default function SearchBarWithCommands() {
         >
           <Paperclip className="w-5 h-5" />
         </button>
+      </div>
+
+      {/* Prompts Carousel */}
+      <div className="mt-6 relative w-full max-w-3xl mx-auto">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Suggested prompts:
+          </h3>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => handleCarouselNavigation('left')}
+              className="p-1 rounded-full hover:bg-gray-200 text-gray-700"
+              aria-label="Previous prompts"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => handleCarouselNavigation('right')}
+              className="p-1 rounded-full hover:bg-gray-200 text-gray-700"
+              aria-label="Next prompts"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        
+        <div ref={carouselRef} className="overflow-hidden">
+          <motion.div
+            animate={{ 
+              x: `-${(carouselPosition % allPrompts.length) * 2}px` 
+            }}
+            transition={{ 
+              ease: "linear", 
+              duration: 0.2 
+            }}
+            className="space-y-3"
+          >
+            {getVisibleItems().map((row, rowIndex) => (
+              <div key={`row-${rowIndex}`} className="grid grid-cols-2 gap-3">
+                {row.map((prompt, idx) => (
+                  <div
+                    key={`prompt-${rowIndex}-${idx}`}
+                    onClick={() => handlePromptClick(prompt.text)}
+                    className={cn(
+                      getBackgroundColor(prompt.color),
+                      "p-4 rounded-md cursor-pointer hover:opacity-80 transition-opacity",
+                      "text-gray-800 text-sm flex items-center min-h-12",
+                      "border border-gray-200",
+                      "min-w-64 max-w-80"
+                    )}
+                    style={{ minWidth: '300px' }}
+                  >
+                    {prompt.text}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </motion.div>
+        </div>
       </div>
 
       {/* Attachments Preview */}

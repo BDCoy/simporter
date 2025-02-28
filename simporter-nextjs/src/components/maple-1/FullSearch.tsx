@@ -4,8 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 
 // UI Components
-import SearchBarWithCommands from "@/components/ui/SearchBarWithCommands";
-// We are no longer using InspiringCarousel as per your instructions.
+import SearchBarWithCommands from "@/components/maple-1/SearchBarWithCommands";
 import ProjectCard, { Project as ProjectType } from "@/components/ui/ProjectCard";
 
 export default function FullSearch() {

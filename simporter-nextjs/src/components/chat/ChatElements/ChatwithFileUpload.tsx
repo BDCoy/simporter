@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useRef } from 'react';
-import { Task } from './TaskList';
+import { Task } from '../Tabs/TaskList';
 
 interface Message {
   id: string;
